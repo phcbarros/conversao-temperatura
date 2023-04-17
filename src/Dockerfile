@@ -4,9 +4,10 @@ ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --ignore-scripts
+RUN --mount=type=cache,target=/app/.npm \
+  npm set cache /app/.npm && \
+  npm ci --only=production --ignore-scripts
 COPY . .
-RUN npm prune --production
 
 FROM node:18.15-buster-slim 
 ENV NODE_ENV=production
